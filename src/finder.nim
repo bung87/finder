@@ -2,34 +2,29 @@
 import os, tables, strformat, base64, ospaths
 import zip/zipfiles
 
-type FinderDestType {.pure.}= enum
-  fs,memory
-
-type FinderSourceType {.pure.}= enum
-  fs,zip
+type FinderType {.pure.} = enum
+  fs,
+  fs2mem,
+  zip2mem,
+  zip
 
 type Finder = object
-  case dType:FinderDestType
-    of FinderDestType.fs: 
-      case sType:FinderSourceType
-        of FinderSourceType.fs:
-          indexes:Table[string,string] # store relpath -> abspath
-        of FinderSourceType.zip:
-          zipFile:ZipArchive
-    of FinderDestType.memory:
-      case sType:FinderSourceType
-        of FinderSourceType.fs:
-          tableData:Table[string,string]
-        of FinderSourceType.zip:
-          zipData:string
+  case fType:FinderType
+    of FinderType.fs:
+      base:string
+    of FinderType.zip:
+      zipFile:ZipArchive
+    of FinderType.fs2mem:
+      tableData:Table[string,string]
+    of FinderType.zip2mem:
+      zipData:string
       
 
 template initFinder(x:typed,arg:typed) =
   block:
     let isFile =  if p.existsFile: true else : false 
-    if x.dType == FinderDestType.memory and not isFile:
+    if x.fType == FinderType.fs2mem:
       # read dir from memory
-      x.sType = FinderSourceType.fs
       var assets = initTable[string, string]()
       var key, val: string
       let p = arg.expandTilde.absolutePath
@@ -39,19 +34,18 @@ template initFinder(x:typed,arg:typed) =
         assets.add(key, val)
       x.tableData = assets
     
-    elif x.dType == FinderDestType.memory and isFile:
+    elif x.fType == FinderType.zip2mem:
       # read from memory zip
-      x.sType = FinderSourceType.zip
-      x.data = readFile p
-    elif x.dType == FinderDestType.fs and isFile:
+      x.zipData = readFile p
+    elif x.fType == FinderType.zip:
       # read from file system zip
-      x.sType = FinderSourceType.zip
-      x.data = readFile p
+      var zip:ZipArchive
+      let openSuccess  = zip.open(p,fmRead)
+      x.zipFile = zip
 
 when isMainModule:
   var x:Finder
-  x.dType = FinderDestType.memory
-  # const p = "/Users/bung/nim_works/finder/tests"
+  x.fType = FinderType.fs2mem
   let p = "./tests"
   initFinder(x,p)
   echo  x.tableData
