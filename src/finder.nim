@@ -37,8 +37,7 @@ template initFinder*(x:typed,arg:typed) =
       # read from memory zip
       # var s = toSeq(arg.items)
       var zip:ZipArchive
-      echo arg
-      zip.fromBuffer(arg.cstring)
+      zip.fromBuffer(arg)
       x.zipData = zip.addr
     elif x.fType == FinderType.zip:
       # read from file system zip
@@ -58,8 +57,7 @@ proc get*(x:Finder,path:string):string =
   elif x.fType == FinderType.zip2mem:
     # read from memory zip
     var s = newStringStream()
-    x.zipData[].extractData(path,s)
-    echo s.data
+    x.zipData[].extractFile(path,s)
     result = s.data
   elif x.fType == FinderType.zip:
     # read from file system zip
@@ -86,6 +84,6 @@ when isMainModule:
 
   var z:Finder
   z.fType = FinderType.zip2mem
-  const archive = readFile( currentSourcePath.parentDir() / "../tests/Archive.zip")
+  const archive = staticRead( currentSourcePath.parentDir() / "../tests/Archive.zip")
   initFinder(z,archive)
   assert z.get("config.nims") == r
