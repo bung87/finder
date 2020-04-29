@@ -44,5 +44,5 @@ install:
   - choosenim $CHANNEL
 
 script:
-    - nimble install --depsOnl -y
+    - nimble install --depsOnly -y
     - nimble test
