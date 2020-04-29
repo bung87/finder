@@ -1,5 +1,5 @@
 
-import os, tables, strformat
+import os, tables, strformat,sequtils
 import zip/[zipfiles,libzip],streams
 
 type FinderType* {.pure.} = enum
@@ -17,7 +17,7 @@ type Finder* = object
     of FinderType.fs2mem:
       tableData:Table[string,string]
     of FinderType.zip2mem:
-      zipData:PZipSource
+      zipData:ptr ZipArchive
       
 
 template initFinder*(x:typed,arg:typed) =
@@ -35,9 +35,11 @@ template initFinder*(x:typed,arg:typed) =
     
     elif x.fType == FinderType.zip2mem:
       # read from memory zip
-      var err:ptr int32
-      var s = p.cstring
-      x.zipData = zip_source_buffer_create(cast[pointer]( s.unsafeAddr),len(p).uint64,0,err)
+      # var s = toSeq(arg.items)
+      var zip:ZipArchive
+      echo arg
+      zip.fromBuffer(arg.cstring)
+      x.zipData = zip.addr
     elif x.fType == FinderType.zip:
       # read from file system zip
       let p = arg.expandTilde.absolutePath
@@ -55,7 +57,10 @@ proc get*(x:Finder,path:string):string =
       result = x.tableData[path] 
   elif x.fType == FinderType.zip2mem:
     # read from memory zip
-    discard
+    var s = newStringStream()
+    x.zipData[].extractData(path,s)
+    echo s.data
+    result = s.data
   elif x.fType == FinderType.zip:
     # read from file system zip
     var s = newStringStream()
@@ -78,4 +83,9 @@ when isMainModule:
   let p2 = "./tests/Archive.zip"
   initFinder(y,p2)
   assert y.get("config.nims") == r
-    
+
+  var z:Finder
+  z.fType = FinderType.zip2mem
+  const archive = readFile( currentSourcePath.parentDir() / "../tests/Archive.zip")
+  initFinder(z,archive)
+  assert z.get("config.nims") == r
