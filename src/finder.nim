@@ -70,20 +70,31 @@ proc get*(x:Finder,path:string):string =
 
 when isMainModule:
   const r = "switch(\"path\", \"$projectDir/../src\")"
+
+  # fs2mem
   var x:Finder
   x.fType = FinderType.fs2mem
   let p = "./tests"
   initFinder(x,p)
   assert x.tableData.hasKey("config.nims")
   assert x.get("config.nims") == r
+
+  # zip
   var y:Finder
   y.fType = FinderType.zip
   let p2 = "./tests/Archive.zip"
   initFinder(y,p2)
   assert y.get("config.nims") == r
 
+  # zip2mem
   var z:Finder
   z.fType = FinderType.zip2mem
   const archive = staticRead( currentSourcePath.parentDir() / "../tests/Archive.zip")
   initFinder(z,archive)
   assert z.get("config.nims") == r
+
+  #fs
+  var g:Finder
+  g.fType = FinderType.fs
+  initFinder(g, "./tests")
+  assert g.get("config.nims") == r
