@@ -35,7 +35,6 @@ template initFinder*(x:var Finder,arg:string) =
     
     elif x.fType == FinderType.zip2mem:
       # read from memory zip
-      # var s = toSeq(arg.items)
       var zip:ZipArchive
       zip.fromBuffer(arg)
       x.zipData = zip.addr
