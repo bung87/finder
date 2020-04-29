@@ -1,7 +1,7 @@
 
 import os, tables, strformat
 import zip/zipfiles,streams
-
+export zipfiles
 type FinderType* {.pure.} = enum
   fs,
   fs2mem,
@@ -20,7 +20,7 @@ type Finder* = object
       zipData:ptr ZipArchive
       
 
-template initFinder*(x:var Finder,arg:string) =
+template initFinder*(x:typed,arg:typed) =
   block:
     if x.fType == FinderType.fs2mem:
       # read dir from memory
@@ -44,7 +44,7 @@ template initFinder*(x:var Finder,arg:string) =
       var zip:ZipArchive
       let openSuccess  = zip.open(p,fmRead)
       if not openSuccess:
-        raise newException(OSError,fmt"can't open {p}")
+        raise newException(OSError,"can't open " & p)
       x.zipFile = zip.addr
     elif x.fType == FinderType.fs:
       let p = arg.expandTilde.absolutePath
@@ -66,5 +66,3 @@ proc get*(x:Finder,path:string):string =
   elif x.fType == FinderType.fs:
     let p = absolutePath(path,x.base)
     result = readFile(p)
-
-  
