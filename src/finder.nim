@@ -1,6 +1,6 @@
 
-import os, tables, strformat,sequtils
-import zip/[zipfiles,libzip],streams
+import os, tables, strformat
+import zip/zipfiles,streams
 
 type FinderType* {.pure.} = enum
   fs,
@@ -9,7 +9,7 @@ type FinderType* {.pure.} = enum
   zip
 
 type Finder* = object
-  case fType:FinderType
+  case fType*:FinderType
     of FinderType.fs:
       base:string
     of FinderType.zip:
@@ -20,7 +20,7 @@ type Finder* = object
       zipData:ptr ZipArchive
       
 
-template initFinder*(x:typed,arg:typed) =
+template initFinder*(x:var Finder,arg:string) =
   block:
     if x.fType == FinderType.fs2mem:
       # read dir from memory
@@ -68,33 +68,4 @@ proc get*(x:Finder,path:string):string =
     let p = absolutePath(path,x.base)
     result = readFile(p)
 
-when isMainModule:
-  const r = "switch(\"path\", \"$projectDir/../src\")"
-
-  # fs2mem
-  var x:Finder
-  x.fType = FinderType.fs2mem
-  let p = "./tests"
-  initFinder(x,p)
-  assert x.tableData.hasKey("config.nims")
-  assert x.get("config.nims") == r
-
-  # zip
-  var y:Finder
-  y.fType = FinderType.zip
-  let p2 = "./tests/Archive.zip"
-  initFinder(y,p2)
-  assert y.get("config.nims") == r
-
-  # zip2mem
-  var z:Finder
-  z.fType = FinderType.zip2mem
-  const archive = staticRead( currentSourcePath.parentDir() / "../tests/Archive.zip")
-  initFinder(z,archive)
-  assert z.get("config.nims") == r
-
-  #fs
-  var g:Finder
-  g.fType = FinderType.fs
-  initFinder(g, "./tests")
-  assert g.get("config.nims") == r
+  
