@@ -1,4 +1,4 @@
-# finder  
+# finder   [![Build Status](travis)](https://travis-ci.org/bung87/finder)  
 
 fs memory zip finder implement in Nim
 
@@ -36,3 +36,5 @@ g.fType = FinderType.fs
 initFinder(g, "./tests")
 assert g.get("config.nims") == r
 ```
+
+[travis]: https://travis-ci.org/bung87/finder.svg?branch=master
