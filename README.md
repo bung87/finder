@@ -1,7 +1,14 @@
 # finder   [![Build Status](travis)](https://travis-ci.org/bung87/finder)  
 
 fs memory zip finder implement in Nim
+# compile config  
 
+`switch("d","nimOldCaseObjects")`  
+
+# prerequires  
+
+macos:`libzip`  
+linux:`libzip-dev`  
 
 ## usage  
 
