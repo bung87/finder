@@ -30,7 +30,7 @@ template initFinder*(x:typed,arg:typed) =
       for path in p.walkDirRec():
         key = path.relativePath(p)
         val = readFile(path)
-        assets.add(key, val)
+        assets[key] = val
       x.tableData = assets
     
     elif x.fType == FinderType.zip2mem:
