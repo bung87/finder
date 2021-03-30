@@ -1,7 +1,8 @@
 
 import os, tables, strformat
-import zip/zipfiles,streams
-export zipfiles
+import zippy/ziparchives,streams
+export ziparchives
+
 type FinderType* {.pure.} = enum
   fs,
   fs2mem,
@@ -35,16 +36,15 @@ template initFinder*(x:typed,arg:typed) =
     
     elif x.fType == FinderType.zip2mem:
       # read from memory zip
-      var zip:ZipArchive
-      zip.fromBuffer(arg)
+      var zip = new ZipArchive
+      zip.open(cast[seq[uint8]](arg))
       x.zipData = zip.addr
     elif x.fType == FinderType.zip:
       # read from file system zip
       let p = arg.expandTilde.absolutePath
-      var zip:ZipArchive
-      let openSuccess  = zip.open(p,fmRead)
-      if not openSuccess:
-        raise newException(OSError,"can't open " & p)
+      var zip = new ZipArchive
+      echo p
+      zip.open(p)
       x.zipFile = zip.addr
     elif x.fType == FinderType.fs:
       let p = arg.expandTilde.absolutePath
@@ -55,14 +55,10 @@ proc get*(x:Finder,path:string):string =
       result = x.tableData[path] 
   elif x.fType == FinderType.zip2mem:
     # read from memory zip
-    var s = newStringStream()
-    x.zipData[].extractFile(path,s)
-    result = s.data
+    result = x.zipData[].contents[path].contents
   elif x.fType == FinderType.zip:
     # read from file system zip
-    var s = newStringStream()
-    x.zipFile[].extractFile(path,s)
-    result = s.data
+    result = x.zipFile[].contents[path].contents
   elif x.fType == FinderType.fs:
     let p = absolutePath(path,x.base)
     result = readFile(p)
