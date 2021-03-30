@@ -43,7 +43,6 @@ template initFinder*(x:typed,arg:typed) =
       # read from file system zip
       let p = arg.expandTilde.absolutePath
       var zip = new ZipArchive
-      echo p
       zip.open(p)
       x.zipFile = zip.addr
     elif x.fType == FinderType.fs:
@@ -62,3 +61,4 @@ proc get*(x:Finder,path:string):string =
   elif x.fType == FinderType.fs:
     let p = absolutePath(path,x.base)
     result = readFile(p)
+

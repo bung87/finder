@@ -1,14 +1,14 @@
 # finder   [![Build Status](travis)](https://travis-ci.org/bung87/finder)  
 
-fs memory zip finder implement in Nim
+fs memory zip finder implement in Nim  
+
+note: 
+when use MacOS context menu `Compress`  
+it will use defalte64 which not compatible with zlib's deflate which not supported by `zippy`  
+
 # compile config  
 
 `switch("d","nimOldCaseObjects")`  
-
-# prerequires  
-
-macos:`libzip`  
-linux:`libzip-dev`  
 
 ## usage  
 
