@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.2.1"
+version       = "0.2.2"
 author        = "bung87"
 description   = "fs memory zip finder implement in Nim"
 license       = "MIT"

@@ -1,4 +1,4 @@
-# finder   [![Build Status](travis)](https://travis-ci.org/bung87/finder)  
+# finder   ![Build Status](https://github.com/bung87/finder/workflows/build/badge.svg)    
 
 fs memory zip finder implement in Nim  
 

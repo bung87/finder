@@ -1,5 +1,5 @@
 
-import os, tables, strformat
+import os, tables
 import zippy/ziparchives,streams
 export ziparchives
 
